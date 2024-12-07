@@ -40,6 +40,9 @@ public class UniWayGUI {
     private JPanel pIngreso;
     private JButton guardarCambiosButton;
     private JCheckBox quieresSerConductorCheckBox;
+    private JButton volverButton;
+    private JButton escogerViajeButton;
+    private JComboBox cbEscogerViaje;
     ListaUsuarios listaUsuarios=new ListaUsuarios();
     ListaViajes listaViajes=new ListaViajes();
     Usuario usuarioActual = null;
@@ -104,8 +107,13 @@ public class UniWayGUI {
                     if(origen==destino){
                         JOptionPane.showMessageDialog(null, "El origen y el destino no pueden ser iguales.");
                     } else {
+                        Nodo actual =listaViajes.inicio;
                         ListaViajes listaviajes = listaViajes.filtrarViajes(origen,destino, viajesTable);
                         listaviajes.ordenarPorHora();
+                        while (actual != null){
+                            cbEscogerViaje.addItem(actual.viaje.id);
+                            actual=actual.siguiente;
+                        }
                         listaviajes.actualizarTabla(viajesTable);
                     }
 
@@ -227,6 +235,24 @@ public class UniWayGUI {
                 guardarCambiosButton.setVisible(true);
                 perfilNombre.setEditable(true);
                 perfilTelf.setEditable(true);
+            }
+        });
+        volverButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpRegistro);
+                tabs.add("Ingreso", tpIngreso);
+            }
+        });
+        escogerViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                escogerViajeButton.setEnabled(false);
+                cbDestinoEV.setEnabled(false);
+                cbOrigenEV.setEnabled(false);
+                buscarViajeButton.setEnabled(false);
+                cbEscogerViaje.setEnabled(false);
+                JOptionPane.showMessageDialog(null,"Se ha escogido el viaje con exito");
             }
         });
     }
