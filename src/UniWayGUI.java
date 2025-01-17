@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class UniWayGUI {
     private JPanel pGeneral;
@@ -15,7 +17,7 @@ public class UniWayGUI {
     private JPanel tpAnadirViaje;
     private JPanel pAnadirViaje;
     private JPanel tpEscogerViaje;
-    private JPanel pEscogerViaje;
+    private JPanel tpBuscarViaje;
     private JPanel tpPerfil;
     private JPanel pPerfil;
     private JTextField RegistroBanner;
@@ -41,8 +43,21 @@ public class UniWayGUI {
     private JButton guardarCambiosButton;
     private JCheckBox quieresSerConductorCheckBox;
     private JButton volverButton;
-    private JButton escogerViajeButton;
+    private JButton escogerViajeButton1;
     private JComboBox cbEscogerViaje;
+    private JButton atrasButton;
+    private JTable table1;
+    private JButton añadirViajeButton1;
+    private JButton eliminarViajeButton;
+    private JPanel tpViajesConductor;
+    private JTable table2;
+    private JButton eliminarButton;
+    private JComboBox comboBox1;
+    private JButton volverButton1;
+    private JPanel tpViaje;
+    private JPanel tpEliminarViaje;
+    private JButton volverButton2;
+    private JPanel tpElminiarViaje;
     ListaUsuarios listaUsuarios=new ListaUsuarios();
     ListaViajes listaViajes=new ListaViajes();
     Usuario usuarioActual = null;
@@ -51,15 +66,20 @@ public class UniWayGUI {
         guardarCambiosButton.setVisible(false);
         tabs.remove(tpRegistro);
         tabs.remove(tpAnadirViaje);
+        tabs.remove(tpBuscarViaje);
         tabs.remove(tpEscogerViaje);
         tabs.remove(tpPerfil);
+        tabs.remove(tpEliminarViaje);
+        tabs.remove(tpViajesConductor);
+        tabs.remove(tpViaje);
 
         JCheckBox tempCB =  new JCheckBox();
         tempCB.setSelected(true);
         Usuario admin = new Usuario("admin", "123", "0000", tempCB);
         listaUsuarios.agragarUsuario(admin);
-
-        Viaje viajeDef = new Viaje(0, "Norte", "Sur", 11, 1.5, admin);
+        ArrayList<String> universidades = new ArrayList<>(Arrays.asList("UDLA Park", "UDLA Granados", "UDLA Colon"));
+        ArrayList<String> sectores = new ArrayList<>(Arrays.asList("Norte", "Sur", "Valles"));
+        Viaje viajeDef = new Viaje(0, "Norte", "UDLA Park", 11, 1.5, admin);
         listaViajes.agregarViaje(viajeDef, viajesTable);
 
         ingresarButton.addActionListener(new ActionListener() {
@@ -72,11 +92,20 @@ public class UniWayGUI {
                         usuarioActual=listaUsuarios.buscaUsuario(banner);
 
 
-                        tabs.addTab("Perfil", tpPerfil);
                         if (listaUsuarios.buscaUsuario(banner).esconductor){
-                            tabs.addTab("Añadir Viaje", tpAnadirViaje);
+                            tabs.addTab("Viajes", tpViajesConductor);
                         }
-                        tabs.addTab("EscogerViaje", tpEscogerViaje);
+                        tabs.addTab("Buscar Viaje", tpBuscarViaje);
+
+                        for (String universidad : universidades){
+                            cbOrigenEV.addItem(universidad);
+                        }
+                        for (String sector : sectores){
+                            cbOrigenEV.addItem(sector);
+                        }
+
+                        tabs.addTab("Perfil", tpPerfil);
+
                         DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Id", "Conductor", "Origen", "Destino", "Hora de salida", "Precio"}, 0);
                         viajesTable.setModel(modelo);
 
@@ -100,21 +129,35 @@ public class UniWayGUI {
         buscarViajeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 try{
 
                     String origen = cbOrigenEV.getSelectedItem().toString();
                     String destino = cbDestinoEV.getSelectedItem().toString();
-                    if(origen==destino){
+                    if(origen.equals(destino)){
                         JOptionPane.showMessageDialog(null, "El origen y el destino no pueden ser iguales.");
                     } else {
-                        Nodo actual =listaViajes.inicio;
-                        ListaViajes listaviajes = listaViajes.filtrarViajes(origen,destino, viajesTable);
-                        listaviajes.ordenarPorHora();
-                        while (actual != null){
-                            cbEscogerViaje.addItem(actual.viaje.id);
-                            actual=actual.siguiente;
+
+                        ListaViajes viajesdisponibles = listaViajes.filtrarViajes(origen,destino, viajesTable);
+                        if (viajesdisponibles != null && !viajesdisponibles.estavacia()){
+                            tabs.remove(tpBuscarViaje);
+                            tabs.remove(tpAnadirViaje);
+                            tabs.remove(tpPerfil);
+                            tabs.addTab("Escoger Viaje", tpEscogerViaje);
+                            tabs.addTab("Perfil", tpPerfil);
+                            viajesdisponibles.ordenarPorHora();
+                            Nodo actual = viajesdisponibles.inicio;
+                            cbEscogerViaje.removeAllItems();
+                            while (actual != null){
+                                cbEscogerViaje.addItem(actual.viaje.id);
+                                actual=actual.siguiente;
+                            }
+                            cbEscogerViaje.setEnabled(true);
+                            viajesdisponibles.actualizarTabla(viajesTable);
+                        } else {
+                            cbEscogerViaje.setEnabled(false);
+                            JOptionPane.showMessageDialog(null, "No hay viajes disponibles");
                         }
-                        listaviajes.actualizarTabla(viajesTable);
                     }
 
                 } catch (Exception ex){
@@ -156,7 +199,7 @@ public class UniWayGUI {
                 tabs.remove(tpPerfil);
                 tabs.remove(tpAnadirViaje);
                 tabs.remove(tpEscogerViaje);
-
+                tabs.remove(tpBuscarViaje);
                 tabs.addTab("Ingreso", tpIngreso);
 
 
@@ -244,15 +287,91 @@ public class UniWayGUI {
                 tabs.add("Ingreso", tpIngreso);
             }
         });
-        escogerViajeButton.addActionListener(new ActionListener() {
+        escogerViajeButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                escogerViajeButton.setEnabled(false);
+                escogerViajeButton1.setEnabled(false);
                 cbDestinoEV.setEnabled(false);
                 cbOrigenEV.setEnabled(false);
                 buscarViajeButton.setEnabled(false);
                 cbEscogerViaje.setEnabled(false);
                 JOptionPane.showMessageDialog(null,"Se ha escogido el viaje con exito");
+            }
+        });
+
+
+        cbOrigenEV.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String origen = String.valueOf(cbOrigenEV.getSelectedItem());
+                if (!universidades.contains(origen)) {
+                    cbDestinoEV.removeAllItems();
+                    for (String universidades : universidades) {
+                        cbDestinoEV.addItem(universidades);
+                    }
+                }else{
+                    cbDestinoEV.removeAllItems();
+                    for (String universidades : universidades) {
+                        cbDestinoEV.addItem(universidades);
+                    }
+                    for (String sector : sectores) {
+                        cbDestinoEV.addItem(sector);
+                    }
+                }
+
+            }
+        });
+        atrasButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpEscogerViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+            }
+        });
+        añadirViajeButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpViajesConductor);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Añadir Viaje",tpAnadirViaje);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+            }
+        });
+        volverButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpAnadirViaje);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Viajes", tpViajesConductor);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+            }
+        });
+        eliminarViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpViajesConductor);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Eliminar Viaje", tpEliminarViaje);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+            }
+        });
+        volverButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpEliminarViaje);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Viajes", tpViajesConductor);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
             }
         });
     }
