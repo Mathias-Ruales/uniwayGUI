@@ -101,7 +101,43 @@ public class ListaViajes {
         }
         return listafiltrada;
     }
-    public void eliminarViaje(String idConductor, JTable jTable) {
+    public ListaViajes filtrarViajesConductor(String idBanner, JTable jTable){
+        ListaViajes listafiltrada = new ListaViajes();
+        Nodo actual = inicio;
+
+        while (actual != null) {
+            if(idBanner.equals(actual.viaje.conductor.idBanner)){
+                listafiltrada.agregarViaje(actual.viaje, jTable);
+            }
+            actual=actual.siguiente;
+        }
+        return listafiltrada;
+    }
+
+    public void eliminarViaje(Viaje viaje, JTable jTable) {
+        if(estavacia()){
+            return;
+        }
+        Nodo actual = inicio;
+        Nodo anterior = null;
+        while (actual != null) {
+            if (actual.viaje == viaje) {
+                if(anterior==null){
+                    inicio = actual.siguiente;
+                } else {
+                    anterior.siguiente = actual.siguiente;
+                }
+                tamano--;
+                break;
+            } else {
+                anterior = actual;
+            }
+            actual=actual.siguiente;
+        }
+        actualizarTabla(jTable);
+    }
+
+    public void eliminarViajes(String idConductor, JTable jTable) {
         if (estavacia()) {
             return;
         }

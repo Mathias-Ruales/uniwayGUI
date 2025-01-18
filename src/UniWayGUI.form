@@ -11,7 +11,7 @@
       <tabbedpane id="b8b4d" binding="tabs">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="200" height="200"/>
+            <preferred-size width="250" height="400"/>
           </grid>
         </constraints>
         <properties/>
@@ -242,7 +242,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="e0c9a" class="javax.swing.JTable" binding="table1" default-binding="true">
+                      <component id="e0c9a" class="javax.swing.JTable" binding="tusViajesTable">
                         <constraints/>
                         <properties/>
                       </component>
@@ -250,7 +250,9 @@
                   </scrollpane>
                   <vspacer id="4a1a4">
                     <constraints>
-                      <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                      <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                        <preferred-size width="-1" height="50"/>
+                      </grid>
                     </constraints>
                   </vspacer>
                   <component id="6e7e1" class="javax.swing.JButton" binding="añadirViajeButton1" default-binding="true">
@@ -461,22 +463,11 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <scrollpane id="19866">
-                    <constraints>
-                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none"/>
-                    <children>
-                      <component id="2ed8c" class="javax.swing.JTable" binding="table2" default-binding="true">
-                        <constraints/>
-                        <properties/>
-                      </component>
-                    </children>
-                  </scrollpane>
                   <vspacer id="2862e">
                     <constraints>
-                      <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                        <preferred-size width="-1" height="50"/>
+                      </grid>
                     </constraints>
                   </vspacer>
                   <component id="54429" class="javax.swing.JButton" binding="eliminarButton" default-binding="true">
@@ -495,7 +486,7 @@
                       <text value="Id de viaje"/>
                     </properties>
                   </component>
-                  <component id="e5c02" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+                  <component id="e5c02" class="javax.swing.JComboBox" binding="cbEliminarViaje">
                     <constraints>
                       <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
@@ -539,6 +530,19 @@
                       <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                   </hspacer>
+                  <scrollpane id="4a30">
+                    <constraints>
+                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="a6d88" class="javax.swing.JTable" binding="eliminarViajeTable">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
                 </children>
               </grid>
             </children>
@@ -664,7 +668,9 @@
               </scrollpane>
               <vspacer id="aff3">
                 <constraints>
-                  <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+                    <preferred-size width="-1" height="50"/>
+                  </grid>
                 </constraints>
               </vspacer>
               <hspacer id="bf5b0">
