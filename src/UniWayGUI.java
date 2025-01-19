@@ -2,8 +2,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -59,6 +57,15 @@ public class UniWayGUI {
     private JPanel tpEliminarViaje;
     private JButton volverButton2;
     private JTable eliminarViajeTable;
+    private JButton registrarVehiculoButton;
+    private JPanel tpRegistrarVehiculo;
+    private JTextField txtPlaca;
+    private JTextField txtPuestos;
+    private JButton registrarButton;
+    private JButton volverButton3;
+    private JComboBox comboBox1;
+    private JComboBox comboBox2;
+    private JComboBox comboBox3;
     private JScrollPane eliminarTable;
     private JPanel tpElminiarViaje;
     ListaUsuarios listaUsuarios=new ListaUsuarios();
@@ -75,6 +82,7 @@ public class UniWayGUI {
         tabs.remove(tpEliminarViaje);
         tabs.remove(tpViajesConductor);
         tabs.remove(tpViaje);
+        tabs.remove(tpRegistrarVehiculo);
 
         JCheckBox tempCB =  new JCheckBox();
         tempCB.setSelected(true);
@@ -233,6 +241,7 @@ public class UniWayGUI {
             public void actionPerformed(ActionEvent e) {
                 tabs.remove(tpIngreso);
                 tabs.add("Registro", tpRegistro);
+                registrarVehiculoButton.setVisible(false);
             }
         });
         crearCuentaButton.addActionListener(new ActionListener() {
@@ -431,6 +440,33 @@ public class UniWayGUI {
                     JOptionPane.showMessageDialog(null,"Se ha eliminado el viaje con exito.");
 
 
+            }
+        });
+        quieroSerConductorCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (quieroSerConductorCheckBox.isSelected()){
+                    registrarVehiculoButton.setVisible(true);
+                    registrarVehiculoButton.setEnabled(true);
+                    crearCuentaButton.setEnabled(false);
+                } else {
+                    registrarVehiculoButton.setVisible(false);
+                    crearCuentaButton.setEnabled(true);
+                }
+            }
+        });
+        quieresSerConductorCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        registrarVehiculoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpRegistro);
+                tabs.addTab("Registrar Vehiculo",tpRegistrarVehiculo);
             }
         });
     }
