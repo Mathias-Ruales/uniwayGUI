@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class UniWayGUI {
     private JPanel pGeneral;
@@ -63,17 +64,39 @@ public class UniWayGUI {
     private JTextField txtPuestos;
     private JButton registrarButton;
     private JButton volverButton3;
-    private JComboBox comboBox1;
-    private JComboBox comboBox2;
-    private JComboBox comboBox3;
+    private JComboBox cbMarca;
+    private JComboBox cbModelo;
+    private JComboBox cbColor;
+    private JTextField txtOrigenViaje;
+    private JTextField txtDestinoViaje;
+    private JTextField txtHoraSalidaViaje;
+    private JTextField txtCarroViaje;
+    private JButton cancelarViajeButton;
+    private JButton registrarVehiculoButton1;
+    private JTextField txtPrecioViaje;
     private JScrollPane eliminarTable;
     private JPanel tpElminiarViaje;
+    ArrayList<String> universidades = new ArrayList<>(Arrays.asList("UDLA Park", "UDLA Granados", "UDLA Colon"));
+    ArrayList<String> sectores = new ArrayList<>(Arrays.asList("Norte", "Sur", "Valles"));
+    ArrayList<String> marcas = new ArrayList<>(Arrays.asList("Kia", "Chevrolet"));
+    ArrayList<String> modelosKia = new ArrayList<>(Arrays.asList("Picanto", "Soul", "Sportage"));
+    ArrayList<String> modelosCh = new ArrayList<>(Arrays.asList("Spark", "Aveo", "Sail"));
+    ArrayList<String> colores = new ArrayList<>(Arrays.asList("Blanco", "Negro", "Gris"));
+
+
+
+
+
+
+    public LinkedList<String> modelos = new LinkedList<>();
     ListaUsuarios listaUsuarios=new ListaUsuarios();
     ListaViajes listaViajes=new ListaViajes();
     Usuario usuarioActual = null;
+    Vehiculo vehiculoActual = null;
     public UniWayGUI() {
         quieresSerConductorCheckBox.setVisible(false);
         guardarCambiosButton.setVisible(false);
+        registrarVehiculoButton1.setVisible(false);
         tabs.remove(tpRegistro);
         tabs.remove(tpAnadirViaje);
         tabs.remove(tpBuscarViaje);
@@ -87,12 +110,14 @@ public class UniWayGUI {
         JCheckBox tempCB =  new JCheckBox();
         tempCB.setSelected(true);
         Usuario admin = new Usuario("admin", "123", "0000", tempCB);
+        Vehiculo carroadmin = new Vehiculo("Kia", "Picanto", "PBL-4013", "Negro", 4);
+        admin.vehiculo = carroadmin;
         listaUsuarios.agragarUsuario(admin);
-        ArrayList<String> universidades = new ArrayList<>(Arrays.asList("UDLA Park", "UDLA Granados", "UDLA Colon"));
-        ArrayList<String> sectores = new ArrayList<>(Arrays.asList("Norte", "Sur", "Valles"));
-        Viaje viajeDef = new Viaje(0, "Norte", "UDLA Park", 11, 1.5, admin);
+
+        Viaje viajeDef = new Viaje(0, "Norte", "UDLA Park", 11, 1.5, 4, admin);
+        viajeDef.vehiculo = carroadmin;
         listaViajes.agregarViaje(viajeDef, viajesTable);
-        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Id", "Conductor", "Origen", "Destino", "Hora de salida", "Precio"}, 0);
+        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Id", "Conductor", "Origen", "Destino", "Hora de salida", "Precio", "Puestos"}, 0);
 
 
         ingresarButton.addActionListener(new ActionListener() {
@@ -199,17 +224,23 @@ public class UniWayGUI {
                 try {
                     String origen = cbOrigenAV.getSelectedItem().toString();
                     String destino = cbDestinoAV.getSelectedItem().toString();
+                    int puestos = vehiculoActual.puestos;
                     if (origen != destino){
                         int horasalida = Integer.parseInt(horaSalidaAV.getText());
                         double precio = Double.parseDouble(precioAV.getText());
                         int id = listaViajes.tamano;
                         Usuario conductor = usuarioActual;
-                        listaViajes.agregarViaje(new Viaje(id, origen, destino, horasalida, precio, conductor), viajesTable);
+                        listaViajes.agregarViaje(new Viaje(id, origen, destino, horasalida, precio, puestos, conductor), viajesTable);
+
+                        JOptionPane.showMessageDialog(null, "Viajes agregada con exito");
+
+
 
                         cbOrigenEV.setSelectedIndex(0);
                         cbDestinoEV.setSelectedIndex(0);
                         horaSalidaAV.setText("");
                         precioAV.setText("");
+
                     } else {
                         JOptionPane.showMessageDialog(null, "El origen y el destino no pueden ser iguales");
                     }
@@ -252,7 +283,9 @@ public class UniWayGUI {
                     String nombre = RegistroNombre.getText();
                     String telefono = RegistroTelefono.getText();
                     Usuario usuario = new Usuario(nombre, idBanner, telefono, quieroSerConductorCheckBox);
-
+                    if (quieresSerConductorCheckBox.isSelected()){
+                        usuario.vehiculo=vehiculoActual;
+                    }
                     listaUsuarios.agragarUsuario(usuario);
                     JOptionPane.showMessageDialog(null, "Usuario agregado exitosamente");
 
@@ -329,7 +362,30 @@ public class UniWayGUI {
             public void actionPerformed(ActionEvent e) {
                 int id = (Integer)cbEscogerViaje.getSelectedItem();
                 Viaje viajeEscogido = listaViajes.escogerViaje(id);
-                viajeEscogido.agregarPasagero(usuarioActual);
+                if(viajeEscogido.puestosDisponibles > 0){
+                    viajeEscogido.agregarPasagero(usuarioActual);
+                    viajeEscogido.puestosDisponibles--;
+
+                    usuarioActual.viajeEnCurso = viajeEscogido;
+
+                    listaViajes.actualizarTabla(viajesTable);
+                }
+                atrasButton.setEnabled(false);
+                tabs.remove(tpEscogerViaje);
+                tabs.addTab("Viaje", tpViaje);
+                tabs.setSelectedComponent(tpViaje);
+
+                txtOrigenViaje.setText(viajeEscogido.origen);
+                txtOrigenViaje.setEditable(false);
+                txtDestinoViaje.setText(viajeEscogido.destino);
+                txtDestinoViaje.setEditable(false);
+                txtCarroViaje.setText(viajeEscogido.conductor.vehiculo.marca + " " + viajeEscogido.conductor.vehiculo.modelo + " " + viajeEscogido.conductor.vehiculo.color);
+                txtCarroViaje.setEditable(false);
+                txtPrecioViaje.setText(String.valueOf(viajeEscogido.precio));
+                txtPrecioViaje.setEditable(false);
+                txtHoraSalidaViaje.setText(String.valueOf(viajeEscogido.horaSalida));
+                txtHoraSalidaViaje.setEditable(false);
+
                 JOptionPane.showMessageDialog(null,"Se ha escogido el viaje con exito");
             }
         });
@@ -467,10 +523,120 @@ public class UniWayGUI {
             public void actionPerformed(ActionEvent e) {
                 tabs.remove(tpRegistro);
                 tabs.addTab("Registrar Vehiculo",tpRegistrarVehiculo);
+                cbMarca.removeAllItems();
+                for (String marcas: marcas){
+                    cbMarca.addItem(marcas);
+                }
+
+            }
+        });
+
+        cbMarca.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cbModelo.removeAllItems();
+                String marca = cbMarca.getSelectedItem().toString();
+                if (marca == "Kia"){
+                    for (String modelo: modelosKia){
+                        cbModelo.addItem(modelo);
+                    }
+                } else {
+                    for (String modelo: modelosCh){
+                        cbModelo.addItem(modelo);
+                    }
+                }
+
+            }
+        });
+        cbModelo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cbColor.removeAllItems();
+                for (String colores: colores){
+                    cbColor.addItem(colores);
+                }
+            }
+        });
+        registrarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String marca = cbMarca.getSelectedItem().toString();
+                    String modelo = cbModelo.getSelectedItem().toString();
+                    String placa = txtPlaca.getText();
+                    String color = cbColor.getSelectedItem().toString();
+                    int puestos = Integer.parseInt(txtPuestos.getText());
+
+                    vehiculoActual = new Vehiculo(marca, modelo, placa, color, puestos);
+
+                    tabs.remove(tpRegistrarVehiculo);
+
+                    if (usuarioActual != null){
+                        usuarioActual.vehiculo = vehiculoActual;
+                        tabs.addTab("Viajes", tpViajesConductor);
+                        tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                        tabs.addTab("Perfil", tpPerfil);
+                    } else {
+                        tabs.addTab("Registro",tpRegistro);
+                        registrarVehiculoButton.setEnabled(false);
+                        crearCuentaButton.setEnabled(true);
+                    }
+                    JOptionPane.showMessageDialog(null, "Registro exitoso");
+
+
+
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(null,"No se puede registrar vehiculo");
+                }
+            }
+        });
+        volverButton3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpRegistrarVehiculo);
+                if (usuarioActual == null) {
+                    tabs.addTab("Registro", tpRegistro);
+                } else {
+                    if (usuarioActual.esconductor){
+                        tabs.addTab("Tus Viajes", tpViajesConductor);
+                    }
+                    tabs.addTab("Escoger Viaje", tpEscogerViaje);
+                    tabs.addTab("Perfil", tpPerfil);
+                    tabs.setSelectedComponent(tpPerfil);
+                }
+            }
+        });
+
+        quieresSerConductorCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (quieresSerConductorCheckBox.isSelected() && usuarioActual.vehiculo == null){
+                    registrarVehiculoButton1.setVisible(true);
+                    registrarVehiculoButton1.setEnabled(true);
+                    guardarCambiosButton.setEnabled(false);
+                } else {
+                    registrarVehiculoButton1.setVisible(false);
+                    registrarVehiculoButton1.setEnabled(false);
+                    guardarCambiosButton.setEnabled(true);
+                }
+            }
+        });
+        registrarVehiculoButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpPerfil);
+                tabs.remove(tpBuscarViaje);
+                if (usuarioActual.esconductor){
+                    tabs.remove(tpViajesConductor);
+                }
+                tabs.addTab("Registrar Vehiculo",tpRegistrarVehiculo);
+                cbMarca.removeAllItems();
+                for (String marcas: marcas){
+                    cbMarca.addItem(marcas);
+                }
             }
         });
     }
-
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("UniWayGUI");

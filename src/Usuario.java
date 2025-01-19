@@ -4,11 +4,17 @@ import java.util.LinkedList;
 public class Usuario {
     String nombre, idBanner, telefono;
     boolean esconductor;
+    Vehiculo vehiculo;
+    Viaje viajeEnCurso;
+
     public Usuario(String nombre, String idBanner, String telefono, JCheckBox jCheckBox){
         this.nombre = nombre;
         this.idBanner = idBanner;
         this.telefono = telefono;
         this.esconductor = jCheckBox.isSelected();
+        this.vehiculo = null;
+        this.viajeEnCurso = null;
+
     }
 
     public String getIdBanner() {

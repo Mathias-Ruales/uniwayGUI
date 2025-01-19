@@ -51,7 +51,8 @@ public class ListaViajes {
                     actual.viaje.origen,
                     actual.viaje.destino,
                     actual.viaje.horaSalida,
-                    actual.viaje.precio
+                    actual.viaje.precio,
+                    actual.viaje.puestosDisponibles
             });
             actual=actual.siguiente;
         }

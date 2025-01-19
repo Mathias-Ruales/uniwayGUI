@@ -1,9 +1,14 @@
+import java.util.LinkedList;
+
 public class Vehiculo {
-    private String marca;
-    private String modelo;
-    private String placa;
-    private String color;
-    private int puestos;
+    public String marca;
+    public String modelo;
+    public String placa;
+    public String color;
+    public int puestos;
+    public Usuario conductor;
+
+
 
     public Vehiculo(String marca, String modelo, String placa, String color, int puestos) {
         this.marca = marca;
@@ -11,6 +16,7 @@ public class Vehiculo {
         this.placa = placa;
         this.color = color;
         this.puestos = puestos;
+        this.conductor = null;
     }
 
 
