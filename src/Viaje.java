@@ -6,8 +6,9 @@ public class Viaje {
     String origen, destino, conductorid;
     double precio;
     Usuario conductor;
-    List<Usuario> pasageros;
+    List<Usuario> pasajeros;
     Vehiculo vehiculo;
+    boolean viajeFinalizado;
 
 
     public Viaje(int id, String origen, String destino, int horaSalida, double precio, int puestosDisponibles, Usuario conductor) {
@@ -20,18 +21,19 @@ public class Viaje {
         this.puestosDisponibles = puestosDisponibles;
         this.conductorid= conductor.getIdBanner();
         this.vehiculo=null;
-        this.pasageros = new ArrayList<Usuario>();
+        this.pasajeros = new ArrayList<Usuario>();
+        this.viajeFinalizado = false;
     }
 
-    public void agregarPasagero(Usuario pasajero) {
-        pasageros.add(pasajero);
+    public void agregarPasajero(Usuario pasajero) {
+        pasajeros.add(pasajero);
     }
 
     public void eliminarPasagero(Usuario pasajero) {
-        pasageros.remove(pasajero);
+        pasajeros.remove(pasajero);
     }
 
-    public List<Usuario> getPasageros() {
-        return pasageros;
+    public List<Usuario> getPasajeros() {
+        return pasajeros;
     }
 }

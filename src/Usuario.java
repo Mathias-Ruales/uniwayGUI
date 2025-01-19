@@ -6,6 +6,7 @@ public class Usuario {
     boolean esconductor;
     Vehiculo vehiculo;
     Viaje viajeEnCurso;
+    Viaje manejando;
 
     public Usuario(String nombre, String idBanner, String telefono, JCheckBox jCheckBox){
         this.nombre = nombre;
@@ -14,6 +15,7 @@ public class Usuario {
         this.esconductor = jCheckBox.isSelected();
         this.vehiculo = null;
         this.viajeEnCurso = null;
+        this.manejando = null;
 
     }
 

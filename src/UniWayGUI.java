@@ -74,6 +74,16 @@ public class UniWayGUI {
     private JButton cancelarViajeButton;
     private JButton registrarVehiculoButton1;
     private JTextField txtPrecioViaje;
+    private JButton comenzarViajeButton;
+    private JButton empezarViajeButton;
+    private JPanel tpViajeEnCurso;
+    private JPanel tpCalificar;
+    private JTextField txtOrigenVEC;
+    private JTextField txtDestinoVEC;
+    private JTextField txtPasajerosVEC;
+    private JButton finalizarViajeButton;
+    private JComboBox comboBox1;
+    private JButton calificarButton;
     private JScrollPane eliminarTable;
     private JPanel tpElminiarViaje;
     ArrayList<String> universidades = new ArrayList<>(Arrays.asList("UDLA Park", "UDLA Granados", "UDLA Colon"));
@@ -97,6 +107,8 @@ public class UniWayGUI {
         quieresSerConductorCheckBox.setVisible(false);
         guardarCambiosButton.setVisible(false);
         registrarVehiculoButton1.setVisible(false);
+
+
         tabs.remove(tpRegistro);
         tabs.remove(tpAnadirViaje);
         tabs.remove(tpBuscarViaje);
@@ -106,6 +118,8 @@ public class UniWayGUI {
         tabs.remove(tpViajesConductor);
         tabs.remove(tpViaje);
         tabs.remove(tpRegistrarVehiculo);
+        tabs.remove(tpViajeEnCurso);
+        tabs.remove(tpCalificar);
 
         JCheckBox tempCB =  new JCheckBox();
         tempCB.setSelected(true);
@@ -124,35 +138,50 @@ public class UniWayGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try{
-
                     String banner = IngresoBanner.getText();
                     if (listaUsuarios.buscaUsuario(banner) != null){
                         JOptionPane.showMessageDialog(null, "Ingreso exitoso");
+                        tabs.remove(tpIngreso);
                         usuarioActual=listaUsuarios.buscaUsuario(banner);
 
-                        viajesTable.setModel(modelo);
+                        if (usuarioActual.viajeEnCurso != null){
+                            if (!usuarioActual.viajeEnCurso.viajeFinalizado){
+                                tabs.addTab("Viaje", tpViaje);
+                            } else {
+                                tabs.addTab("Calificar", tpCalificar);
+                                usuarioActual.viajeEnCurso = null;
+                            }
+                            tabs.addTab("Perfil", tpPerfil);
+                        } else {
 
-                        if (listaUsuarios.buscaUsuario(banner).esconductor){
-                            tabs.addTab("Viajes", tpViajesConductor);
-                            tusViajesTable.setModel(modelo);
-                            eliminarViajeTable.setModel(modelo);
-                            ListaViajes viajesconductor = listaViajes.filtrarViajesConductor(usuarioActual.idBanner, tusViajesTable);
-                            viajesconductor.actualizarTabla(eliminarViajeTable);
-                            viajesconductor.actualizarTabla(tusViajesTable);
+                            viajesTable.setModel(modelo);
+
+                            if (listaUsuarios.buscaUsuario(banner).esconductor && usuarioActual.manejando != null) {
+                                tabs.addTab("Viaje en Curso", tpViajeEnCurso);
+                                tabs.addTab("Perfil", tpPerfil);
+                            } else {
+                                if (listaUsuarios.buscaUsuario(banner).esconductor) {
+                                    tabs.addTab("Viajes", tpViajesConductor);
+                                    tusViajesTable.setModel(modelo);
+                                    eliminarViajeTable.setModel(modelo);
+                                    ListaViajes viajesconductor = listaViajes.filtrarViajesConductor(usuarioActual.idBanner, tusViajesTable);
+                                    viajesconductor.actualizarTabla(eliminarViajeTable);
+                                    viajesconductor.actualizarTabla(tusViajesTable);
+                                }
+                                tabs.addTab("Buscar Viaje", tpBuscarViaje);
+                                cbOrigenEV.removeAllItems();
+                                for (String universidad : universidades){
+                                    cbOrigenEV.addItem(universidad);
+                                }
+                                for (String sector : sectores){
+                                    cbOrigenEV.addItem(sector);
+                                }
+
+                                tabs.addTab("Perfil", tpPerfil);
+
+                            }
+
                         }
-
-                        tabs.addTab("Buscar Viaje", tpBuscarViaje);
-                        cbOrigenEV.removeAllItems();
-                        for (String universidad : universidades){
-                            cbOrigenEV.addItem(universidad);
-                        }
-                        for (String sector : sectores){
-                            cbOrigenEV.addItem(sector);
-                        }
-
-                        tabs.addTab("Perfil", tpPerfil);
-
-                        tabs.remove(tpIngreso);
                         perfilBanner.setText(listaUsuarios.buscaUsuario(banner).idBanner);
                         perfilBanner.setEditable(false);
                         perfilNombre.setText(listaUsuarios.buscaUsuario(banner).nombre);
@@ -160,6 +189,7 @@ public class UniWayGUI {
                         perfilTelf.setText(listaUsuarios.buscaUsuario(banner).telefono);
                         perfilTelf.setEditable(false);
                         IngresoBanner.setText("");
+
                     }
 
                 } catch (Exception ex){
@@ -258,11 +288,19 @@ public class UniWayGUI {
                 if(usuarioActual.esconductor){
                     tabs.remove(tpViajesConductor);
                 }
+
+                atrasButton.setEnabled(true);
+
                 tabs.remove(tpPerfil);
                 tabs.remove(tpAnadirViaje);
                 tabs.remove(tpEscogerViaje);
                 tabs.remove(tpBuscarViaje);
+                tabs.remove(tpViaje);
+                tabs.remove(tpViajeEnCurso);
+                tabs.remove(tpCalificar);
                 tabs.addTab("Ingreso", tpIngreso);
+
+
 
 
             }
@@ -363,7 +401,7 @@ public class UniWayGUI {
                 int id = (Integer)cbEscogerViaje.getSelectedItem();
                 Viaje viajeEscogido = listaViajes.escogerViaje(id);
                 if(viajeEscogido.puestosDisponibles > 0){
-                    viajeEscogido.agregarPasagero(usuarioActual);
+                    viajeEscogido.agregarPasajero(usuarioActual);
                     viajeEscogido.puestosDisponibles--;
 
                     usuarioActual.viajeEnCurso = viajeEscogido;
@@ -372,7 +410,11 @@ public class UniWayGUI {
                 }
                 atrasButton.setEnabled(false);
                 tabs.remove(tpEscogerViaje);
+                tabs.remove(tpPerfil);
+
                 tabs.addTab("Viaje", tpViaje);
+                tabs.addTab("Perfil", tpPerfil);
+
                 tabs.setSelectedComponent(tpViaje);
 
                 txtOrigenViaje.setText(viajeEscogido.origen);
@@ -449,6 +491,8 @@ public class UniWayGUI {
         eliminarViajeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                comenzarViajeButton.setVisible(false);
+                eliminarButton.setVisible(true);
                 ListaViajes viajesconductor = listaViajes.filtrarViajesConductor(usuarioActual.idBanner, eliminarViajeTable);
                 tabs.remove(tpViajesConductor);
                 tabs.remove(tpBuscarViaje);
@@ -468,6 +512,8 @@ public class UniWayGUI {
         volverButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                eliminarButton.setVisible(true);
+                comenzarViajeButton.setVisible(true);
                 tabs.remove(tpEliminarViaje);
                 tabs.remove(tpBuscarViaje);
                 tabs.remove(tpPerfil);
@@ -634,6 +680,85 @@ public class UniWayGUI {
                 for (String marcas: marcas){
                     cbMarca.addItem(marcas);
                 }
+            }
+        });
+        empezarViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eliminarButton.setVisible(false);
+                comenzarViajeButton.setVisible(true);
+                ListaViajes viajesconductor = listaViajes.filtrarViajesConductor(usuarioActual.idBanner, eliminarViajeTable);
+                tabs.remove(tpViajesConductor);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Comenzar Viaje", tpEliminarViaje);
+                tabs.addTab("Buscar Viaje",tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+                Nodo actual = viajesconductor.inicio;
+                cbEliminarViaje.removeAllItems();
+                while (actual != null){
+                    cbEliminarViaje.addItem(actual.viaje.id);
+                    actual=actual.siguiente;
+                }
+            }
+        });
+        comenzarViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tabs.remove(tpEliminarViaje);
+                tabs.remove(tpBuscarViaje);
+                tabs.remove(tpPerfil);
+
+                int id = (Integer)cbEliminarViaje.getSelectedItem();
+                Viaje viajeEscogido = listaViajes.escogerViaje(id);
+                usuarioActual.manejando = viajeEscogido;
+
+                int puestos = viajeEscogido.conductor.vehiculo.puestos - viajeEscogido.puestosDisponibles;
+
+                txtOrigenVEC.setText(viajeEscogido.origen);
+                txtOrigenVEC.setEditable(false);
+                txtDestinoVEC.setText(viajeEscogido.destino);
+                txtDestinoVEC.setEditable(false);
+                txtPasajerosVEC.setText(String.valueOf(puestos));
+                txtPasajerosVEC.setEditable(false);
+
+                tabs.addTab("Viaje en Curso", tpViajeEnCurso);
+                tabs.addTab("Perfil", tpPerfil);
+
+            }
+        });
+        finalizarViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Viaje viajeEscogido = usuarioActual.manejando;
+                for (Usuario pasajeros: viajeEscogido.pasajeros){
+                    pasajeros.viajeEnCurso.viajeFinalizado = true;
+                }
+                usuarioActual.manejando.viajeFinalizado = true;
+                usuarioActual.manejando = null;
+                listaViajes.eliminarViaje(viajeEscogido, tusViajesTable);
+
+                tabs.remove(tpViajeEnCurso);
+                tabs.remove(tpPerfil);
+                tabs.add("Viajes", tpViajesConductor);
+                tabs.add("Perfil", tpPerfil);
+            }
+        });
+
+        calificarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Gracias por tu respuesta");
+                tabs.remove(tpCalificar);
+                tabs.remove(tpPerfil);
+                tabs.addTab("Buscar Viaje", tpBuscarViaje);
+                tabs.addTab("Perfil", tpPerfil);
+            }
+        });
+        cancelarViajeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
     }
